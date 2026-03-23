@@ -144,7 +144,7 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
     .calculator-eingabe {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 24px;
     }
 
     .eingabe-card {
