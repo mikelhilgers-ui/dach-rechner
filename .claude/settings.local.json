@@ -7,7 +7,13 @@
       "Bash(ng add:*)",
       "Bash(npx ng:*)",
       "Bash(start cmd:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(taskkill /PID 70452 /F)",
+      "Bash(taskkill //PID 70452 //F)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(netstat -ano)",
+      "Bash(npm uninstall:*)",
+      "Bash(node generate-icons.mjs)"
     ]
   }
 }
