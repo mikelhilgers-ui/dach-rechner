@@ -42,11 +42,12 @@
   .install-btn {
     margin-right: 4px;
     font-size: 13px;
-    background-color: white !important;
-    color: #37474f !important;
+    background-color: #37474f !important;
+    color: white !important;
+    border: none !important;
 
     html.dark & {
-      background-color: rgba(255,255,255,0.15) !important;
+      background-color: rgba(255,255,255,0.2) !important;
       color: white !important;
     }
 
