@@ -21,25 +21,29 @@
 
 ---
 
-## 🚧 In Arbeit
+### Calculator UI (Sprint 1)
+- [x] App Shell (Toolbar, sticky, responsive)
+- [x] Routing (Lazy Loading `/rechner`)
+- [x] `DachformAuswahlComponent` – 4 Karten (Sattel/Pult/Walm/Flach), aktiv-Hervorhebung
+- [x] `MasseEingabeComponent` – reaktives Formular, Validierung, Formularfelder je Dachform
+- [x] `ErgebnisPanelComponent` – Live-Ergebnis via Signals, sticky auf Desktop
+- [x] `CalculatorComponent` – 2-Spalten-Layout (Eingabe | Ergebnis)
+- [x] Build fehlerfrei, 25/25 Tests grün ✅
 
-- [ ] Calculator UI Component (Dachform-Auswahl + Maßeingabe)
-- [ ] Ergebnis-Panel (live mit Signals)
+---
+
+## 🚧 In Arbeit
 
 ---
 
 ## 📋 Nächste Schritte (Sprint 1)
 
-1. Calculator Hauptkomponente mit Material-Tabs
-2. Dachform-Auswahl (Karten/Chips)
-3. Maßeingabe-Formular je Dachform
-4. Live-Ergebnis-Panel
-5. Verbindungsmittel-Tab
-6. Gauben & Dachfenster
-7. Preiskalkulation
-8. PDF Export (jsPDF)
-9. Excel Export (SheetJS)
-10. Canvas-Visualisierung (optional für Sprint 1)
+1. Verbindungsmittel-Tab
+2. Gauben & Dachfenster
+3. Preiskalkulation
+4. PDF Export (jsPDF)
+5. Excel Export (SheetJS)
+6. Canvas-Visualisierung (optional)
 
 ---
 
