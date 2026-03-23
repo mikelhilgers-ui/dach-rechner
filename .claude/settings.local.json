@@ -6,7 +6,8 @@
       "Bash(ng new:*)",
       "Bash(ng add:*)",
       "Bash(npx ng:*)",
-      "Bash(start cmd:*)"
+      "Bash(start cmd:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

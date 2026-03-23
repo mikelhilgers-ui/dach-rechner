@@ -114,6 +114,37 @@ export interface DachaufbauErgebnis {
   dampfbremse: { flaecheM2: number } | null;
 }
 
+// --- Preiskalkulation ---
+
+export interface PreisConfig {
+  holzPreisProM3: number;          // €/m³ Schnittholz
+  eindeckungPreisProM2: number;    // €/m² Eindeckung
+  unterdeckbahnPreisProM2: number; // €/m²
+  daemmungPreisProM2: number;      // €/m² (inkl. Verlegung)
+  verbindungsmittelPreisProKg: number; // €/kg
+  arbeitskostenProM2: number;      // €/m² Dachfläche (Lohn)
+  aufschlagProzent: number;        // % Gewinn/Overhead
+}
+
+export interface PreisPosition {
+  bezeichnung: string;
+  menge: number;
+  einheit: string;
+  preisProEinheit: number;
+  gesamt: number;
+}
+
+export interface PreisErgebnis {
+  positionen: PreisPosition[];
+  materialkosten: number;
+  arbeitskosten: number;
+  subtotal: number;
+  aufschlag: number;
+  gesamtNetto: number;
+  gesamtBrutto: number;   // + 20% MwSt (AT) oder 19% (DE)
+  mwstSatz: number;
+}
+
 export interface CalculatorState {
   dachform: Dachform;
   masse: DachMasse;

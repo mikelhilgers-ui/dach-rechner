@@ -13,6 +13,9 @@ import {
   EindeckungErgebnis,
   DachaufbauConfig,
   DachaufbauErgebnis,
+  PreisConfig,
+  PreisErgebnis,
+  PreisPosition,
 } from './calculator.models';
 
 @Injectable({ providedIn: 'root' })
@@ -51,6 +54,15 @@ export class CalculatorService {
     daemmungTyp: 'mineralwolle',
     dampfbremseAktiv: false,
   });
+  readonly preisConfig = signal<PreisConfig>({
+    holzPreisProM3:              450,
+    eindeckungPreisProM2:         40,
+    unterdeckbahnPreisProM2:       2,
+    daemmungPreisProM2:           18,
+    verbindungsmittelPreisProKg:   4,
+    arbeitskostenProM2:           35,
+    aufschlagProzent:             15,
+  });
 
   // --- Computed ---
   readonly ergebnis = computed<DachErgebnis>(() =>
@@ -68,6 +80,16 @@ export class CalculatorService {
   readonly dachaufbauErgebnis = computed<DachaufbauErgebnis>(() =>
     this.berechneDachaufbau(this.ergebnis(), this.dachaufbauConfig())
   );
+  readonly preisErgebnis = computed<PreisErgebnis>(() =>
+    this.berechnePreise(
+      this.ergebnis(),
+      this.holzErgebnis(),
+      this.eindeckungErgebnis(),
+      this.dachaufbauErgebnis(),
+      this.verbindungsmittel(),
+      this.preisConfig(),
+    )
+  );
 
   // --- Setter ---
   setDachform(form: Dachform): void { this.dachform.set(form); }
@@ -76,6 +98,7 @@ export class CalculatorService {
   setHolzConfig(cfg: Partial<HolzConfig>): void { this.holzConfig.update(c => ({ ...c, ...cfg })); }
   setEindeckungConfig(cfg: Partial<EindeckungConfig>): void { this.eindeckungConfig.update(c => ({ ...c, ...cfg })); }
   setDachaufbauConfig(cfg: Partial<DachaufbauConfig>): void { this.dachaufbauConfig.update(c => ({ ...c, ...cfg })); }
+  setPreisConfig(cfg: Partial<PreisConfig>): void { this.preisConfig.update(c => ({ ...c, ...cfg })); }
 
   addGaube(gaube: Omit<GaubeConfig, 'id'>): void {
     this.gauben.update(list => [...list, { ...gaube, id: crypto.randomUUID() }]);
@@ -356,5 +379,99 @@ export class CalculatorService {
       : null;
 
     return { unterdeckbahn, daemmung, dampfbremse };
+  }
+
+  // --- Preiskalkulation ---
+  berechnePreise(
+    ergebnis: DachErgebnis,
+    holz: HolzErgebnis,
+    eindeckung: EindeckungErgebnis,
+    dachaufbau: DachaufbauErgebnis,
+    vm: VerbindungsmittelErgebnis,
+    cfg: PreisConfig,
+  ): PreisErgebnis {
+    const positionen: PreisPosition[] = [];
+
+    // Holz
+    for (const pos of holz.positionen) {
+      if (pos.m3 > 0) {
+        positionen.push({
+          bezeichnung: pos.bezeichnung,
+          menge: pos.m3,
+          einheit: 'm³',
+          preisProEinheit: cfg.holzPreisProM3,
+          gesamt: Math.round(pos.m3 * cfg.holzPreisProM3),
+        });
+      }
+    }
+
+    // Eindeckung
+    if (eindeckung.flaecheBrutto > 0) {
+      positionen.push({
+        bezeichnung: `Eindeckung – ${eindeckung.material}`,
+        menge: eindeckung.flaecheBrutto,
+        einheit: 'm²',
+        preisProEinheit: cfg.eindeckungPreisProM2,
+        gesamt: Math.round(eindeckung.flaecheBrutto * cfg.eindeckungPreisProM2),
+      });
+    }
+
+    // Unterdeckbahn
+    if (dachaufbau.unterdeckbahn) {
+      positionen.push({
+        bezeichnung: 'Unterdeckbahn',
+        menge: dachaufbau.unterdeckbahn.flaecheBrutto,
+        einheit: 'm²',
+        preisProEinheit: cfg.unterdeckbahnPreisProM2,
+        gesamt: Math.round(dachaufbau.unterdeckbahn.flaecheBrutto * cfg.unterdeckbahnPreisProM2),
+      });
+    }
+
+    // Dämmung
+    if (dachaufbau.daemmung) {
+      positionen.push({
+        bezeichnung: dachaufbau.daemmung.bezeichnung,
+        menge: dachaufbau.daemmung.flaecheM2,
+        einheit: 'm²',
+        preisProEinheit: cfg.daemmungPreisProM2,
+        gesamt: Math.round(dachaufbau.daemmung.flaecheM2 * cfg.daemmungPreisProM2),
+      });
+    }
+
+    // Dampfbremse (pauschal wie Unterdeckbahn)
+    if (dachaufbau.dampfbremse) {
+      positionen.push({
+        bezeichnung: 'Dampfbremse',
+        menge: dachaufbau.dampfbremse.flaecheM2,
+        einheit: 'm²',
+        preisProEinheit: cfg.unterdeckbahnPreisProM2,
+        gesamt: Math.round(dachaufbau.dampfbremse.flaecheM2 * cfg.unterdeckbahnPreisProM2),
+      });
+    }
+
+    // Verbindungsmittel
+    const vmGesamtKg = vm.positionen.reduce((s, p) => s + p.gewichtKg, 0);
+    if (vmGesamtKg > 0) {
+      positionen.push({
+        bezeichnung: 'Verbindungsmittel',
+        menge: Math.ceil(vmGesamtKg * 10) / 10,
+        einheit: 'kg',
+        preisProEinheit: cfg.verbindungsmittelPreisProKg,
+        gesamt: Math.round(vmGesamtKg * cfg.verbindungsmittelPreisProKg),
+      });
+    }
+
+    const materialkosten = positionen.reduce((s, p) => s + p.gesamt, 0);
+    const arbeitskosten = ergebnis.dachflaeche > 0
+      ? Math.round(ergebnis.dachflaeche * cfg.arbeitskostenProM2)
+      : 0;
+
+    const subtotal = materialkosten + arbeitskosten;
+    const aufschlag = Math.round(subtotal * cfg.aufschlagProzent / 100);
+    const gesamtNetto = subtotal + aufschlag;
+    const mwstSatz = 20;
+    const gesamtBrutto = Math.round(gesamtNetto * (1 + mwstSatz / 100));
+
+    return { positionen, materialkosten, arbeitskosten, subtotal, aufschlag, gesamtNetto, gesamtBrutto, mwstSatz };
   }
 }

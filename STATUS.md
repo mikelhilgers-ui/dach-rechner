@@ -54,16 +54,29 @@
 
 ---
 
-## 🚧 In Arbeit
+### Preiskalkulation + Export (heute)
+- [x] `PreisConfig` + `berechnePreise()`: Material, Arbeit, Aufschlag, MwSt.
+- [x] `PreisKalkulationComponent`: 7 editierbare Preise → Live-Kalkulation mit Brutto-Summe
+- [x] `PdfExportService` (jsPDF): mehrseitiges PDF, alle Sektionen, Firmenname, Brutto-Box
+- [x] `ExcelExportService` (SheetJS): 3 Blätter (Übersicht, Materialien, Preiskalkulation)
+- [x] `ExportButtonsComponent`: Firmenname + Projektname, PDF/Excel Download
+- [x] 44/44 Tests grün ✅
 
 ---
 
-## 📋 Nächste Schritte (Sprint 1)
+## ✅ Sprint 1 – ABGESCHLOSSEN
 
-1. Preiskalkulation (Materialpreise → Gesamtkosten)
-2. PDF Export (jsPDF)
-3. Excel Export (SheetJS)
-4. Canvas-Visualisierung (optional)
+Alle geplanten Features sind fertig. Bereit für Sprint 2 (Auth + Supabase).
+
+---
+
+## 📋 Nächste Schritte (Sprint 2)
+
+1. Supabase Account anlegen
+2. Register / Login Komponenten
+3. Newsletter Opt-in (DSGVO)
+4. Projekte speichern (max. 3)
+5. Firmenname im Profil speichern
 
 ---
 

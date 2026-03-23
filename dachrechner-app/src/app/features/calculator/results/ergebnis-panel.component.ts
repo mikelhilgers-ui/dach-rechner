@@ -91,6 +91,34 @@ import { CalculatorService } from '../../../core/calculator/calculator.service';
           </div>
         }
 
+        <!-- Preis -->
+        @if (calculator.preisErgebnis().positionen.length > 0) {
+          <mat-divider />
+          <div class="ergebnis-section-titel">Kalkulation</div>
+          <div class="ergebnis-liste">
+            <div class="ergebnis-zeile">
+              <mat-icon class="zeile-icon">payments</mat-icon>
+              <span class="zeile-label">Material</span>
+              <span class="zeile-wert">{{ calculator.preisErgebnis().materialkosten | number:'1.0-0' }} <span class="zeile-einheit">€</span></span>
+            </div>
+            <div class="ergebnis-zeile">
+              <mat-icon class="zeile-icon">engineering</mat-icon>
+              <span class="zeile-label">Arbeitskosten</span>
+              <span class="zeile-wert">{{ calculator.preisErgebnis().arbeitskosten | number:'1.0-0' }} <span class="zeile-einheit">€</span></span>
+            </div>
+            <div class="ergebnis-zeile ergebnis-zeile--gesamt">
+              <mat-icon class="zeile-icon">euro</mat-icon>
+              <span class="zeile-label">Netto gesamt</span>
+              <span class="zeile-wert preis-highlight">{{ calculator.preisErgebnis().gesamtNetto | number:'1.0-0' }} <span class="zeile-einheit">€</span></span>
+            </div>
+            <div class="ergebnis-zeile ergebnis-zeile--gesamt">
+              <mat-icon class="zeile-icon">receipt</mat-icon>
+              <span class="zeile-label">Brutto ({{ calculator.preisErgebnis().mwstSatz }}% MwSt)</span>
+              <span class="zeile-wert preis-highlight">{{ calculator.preisErgebnis().gesamtBrutto | number:'1.0-0' }} <span class="zeile-einheit">€</span></span>
+            </div>
+          </div>
+        }
+
         <!-- Dachaufbau -->
         @if (hatDachaufbau()) {
           <mat-divider />
@@ -198,6 +226,10 @@ import { CalculatorService } from '../../../core/calculator/calculator.service';
       font-weight: 500;
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
+    }
+
+    .preis-highlight {
+      color: var(--mat-sys-primary);
     }
 
     .zeile-einheit {
