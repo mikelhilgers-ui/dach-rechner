@@ -1,0 +1,17 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <mat-icon class="toolbar-logo">roofing</mat-icon>
+  <span class="toolbar-title">DachRechner</span>
+  <span class="toolbar-subtitle">Dachflächen-Rechner für Zimmerer</span>
+
+  <span class="toolbar-spacer"></span>
+
+  <button mat-icon-button (click)="toggleTheme()"
+          [matTooltip]="darkMode() ? 'Light Mode' : 'Dark Mode'"
+          class="theme-toggle">
+    <mat-icon>{{ darkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+</mat-toolbar>
+
+<main class="app-main">
+  <router-outlet />
+</main>
