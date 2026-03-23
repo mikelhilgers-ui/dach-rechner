@@ -42,13 +42,25 @@
 
 ---
 
+### Holz, Eindeckung, Dachaufbau (heute)
+- [x] `HolzConfig` + `berechneHolz()`: Sparren/Latten/Konterlatte → lfdm, m³, kg
+- [x] `EindeckungConfig` + `berechneEindeckung()`: 7 Materialien, Stückzahl, Zuschlag
+- [x] `DachaufbauConfig` + `berechneDachaufbau()`: Unterdeckbahn, Dämmung, Dampfbremse
+- [x] `HolzEingabeComponent`: Querschnitt-Auswahl + Live-Vorschau m³/kg
+- [x] `EindeckungEingabeComponent`: Materialauswahl + Live-Ergebnis
+- [x] `DachaufbauEingabeComponent`: Toggles für alle 3 Schichten
+- [x] Ergebnis-Panel: alle Materialien in Sektionen
+- [x] 44/44 Tests grün ✅
+
+---
+
 ## 🚧 In Arbeit
 
 ---
 
 ## 📋 Nächste Schritte (Sprint 1)
 
-1. Preiskalkulation
+1. Preiskalkulation (Materialpreise → Gesamtkosten)
 2. PDF Export (jsPDF)
 3. Excel Export (SheetJS)
 4. Canvas-Visualisierung (optional)

@@ -4,6 +4,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { DachformAuswahlComponent } from './dachform/dachform-auswahl.component';
 import { MasseEingabeComponent } from './masse/masse-eingabe.component';
 import { GaubenEingabeComponent } from './gauben/gauben-eingabe.component';
+import { HolzEingabeComponent } from './holz/holz-eingabe.component';
+import { EindeckungEingabeComponent } from './kalkulation/eindeckung-eingabe.component';
+import { DachaufbauEingabeComponent } from './kalkulation/dachaufbau-eingabe.component';
 import { VerbindungsmittelComponent } from './verbindungsmittel/verbindungsmittel.component';
 import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
 
@@ -15,12 +18,15 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
     DachformAuswahlComponent,
     MasseEingabeComponent,
     GaubenEingabeComponent,
+    HolzEingabeComponent,
+    EindeckungEingabeComponent,
+    DachaufbauEingabeComponent,
     VerbindungsmittelComponent,
     ErgebnisPanelComponent,
   ],
   template: `
     <div class="calculator-layout">
-      <!-- Linke Spalte: Eingabe -->
+
       <div class="calculator-eingabe">
 
         <mat-card class="eingabe-card">
@@ -57,6 +63,39 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
 
         <mat-card class="eingabe-card">
           <mat-card-header>
+            <mat-icon mat-card-avatar>forest</mat-icon>
+            <mat-card-title>Holz / Unterkonstruktion</mat-card-title>
+            <mat-card-subtitle>Querschnitte → m³ und lfdm</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-holz-eingabe />
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="eingabe-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>layers</mat-icon>
+            <mat-card-title>Dachaufbau</mat-card-title>
+            <mat-card-subtitle>Unterdeckbahn, Dämmung, Dampfbremse</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-dachaufbau-eingabe />
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="eingabe-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>roofing</mat-icon>
+            <mat-card-title>Eindeckung</mat-card-title>
+            <mat-card-subtitle>Material & Stückzahl</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-eindeckung-eingabe />
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="eingabe-card">
+          <mat-card-header>
             <mat-icon mat-card-avatar>hardware</mat-icon>
             <mat-card-title>Verbindungsmittel</mat-card-title>
             <mat-card-subtitle>Automatisch berechnet</mat-card-subtitle>
@@ -68,10 +107,10 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
 
       </div>
 
-      <!-- Rechte Spalte: Ergebnis -->
       <div class="calculator-ergebnis">
         <app-ergebnis-panel />
       </div>
+
     </div>
   `,
   styles: [`
@@ -84,7 +123,6 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
       @media (min-width: 960px) {
         grid-template-columns: 1fr 320px;
       }
-
       @media (min-width: 1280px) {
         grid-template-columns: 1fr 360px;
       }
