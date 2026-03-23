@@ -111,7 +111,7 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
           <mat-card-header>
             <mat-icon mat-card-avatar>download</mat-icon>
             <mat-card-title>Export</mat-card-title>
-            <mat-card-subtitle>PDF oder Excel herunterladen</mat-card-subtitle>
+            <mat-card-subtitle>PDF herunterladen</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <app-export-buttons />
