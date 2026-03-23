@@ -62,13 +62,13 @@ describe('CalculatorService', () => {
     });
 
     it('berechnet eine Gaube korrekt', () => {
-      expect(service.gaubenFlaeche([{ breite: 2, hoehe: 1.5, anzahl: 1 }])).toBeCloseTo(3);
+      expect(service.gaubenFlaeche([{ id: '1', typ: 'gaube', breite: 2, hoehe: 1.5, anzahl: 1 }])).toBeCloseTo(3);
     });
 
     it('summiert mehrere Gauben', () => {
       expect(service.gaubenFlaeche([
-        { breite: 2, hoehe: 1.5, anzahl: 2 },
-        { breite: 1, hoehe: 1, anzahl: 1 },
+        { id: '1', typ: 'gaube',      breite: 2, hoehe: 1.5, anzahl: 2 },
+        { id: '2', typ: 'dachfenster', breite: 1, hoehe: 1,   anzahl: 1 },
       ])).toBeCloseTo(7);
     });
   });
@@ -90,7 +90,7 @@ describe('CalculatorService', () => {
     it('Gauben reduzieren die Dachfläche', () => {
       const ohneGauben = service.berechneSatteldach(STD_MASSE, []);
       const mitGauben = service.berechneSatteldach(STD_MASSE, [
-        { breite: 2, hoehe: 1.5, anzahl: 1 }
+        { id: '1', typ: 'gaube', breite: 2, hoehe: 1.5, anzahl: 1 }
       ]);
       expect(mitGauben.dachflaeche).toBeLessThan(ohneGauben.dachflaeche);
     });
@@ -103,7 +103,7 @@ describe('CalculatorService', () => {
 
     it('Dachfläche kann nicht negativ sein', () => {
       const result = service.berechneSatteldach(STD_MASSE, [
-        { breite: 100, hoehe: 100, anzahl: 10 }
+        { id: '1', typ: 'gaube', breite: 100, hoehe: 100, anzahl: 10 }
       ]);
       expect(result.dachflaeche).toBe(0);
     });
@@ -168,6 +168,75 @@ describe('CalculatorService', () => {
     it('delegiert korrekt an Flachdach-Methode', () => {
       const result = service.berechne('flach', STD_MASSE, []);
       expect(result.sparrenAnzahl).toBe(0);
+    });
+  });
+
+  // --- Gauben-Verwaltung ---
+
+  describe('addGaube / removeGaube / updateGaube', () => {
+    it('fügt eine Gaube hinzu', () => {
+      service.setGauben([]);
+      service.addGaube({ typ: 'gaube', breite: 2, hoehe: 1.5, anzahl: 1 });
+      expect(service.gauben().length).toBe(1);
+    });
+
+    it('generiert eindeutige IDs', () => {
+      service.setGauben([]);
+      service.addGaube({ typ: 'gaube', breite: 1, hoehe: 1, anzahl: 1 });
+      service.addGaube({ typ: 'gaube', breite: 2, hoehe: 1, anzahl: 1 });
+      const ids = service.gauben().map(g => g.id);
+      expect(new Set(ids).size).toBe(2);
+    });
+
+    it('entfernt Gaube per ID', () => {
+      service.setGauben([]);
+      service.addGaube({ typ: 'gaube', breite: 2, hoehe: 1, anzahl: 1 });
+      const id = service.gauben()[0].id;
+      service.removeGaube(id);
+      expect(service.gauben().length).toBe(0);
+    });
+
+    it('aktualisiert Gaube per ID', () => {
+      service.setGauben([]);
+      service.addGaube({ typ: 'gaube', breite: 2, hoehe: 1, anzahl: 1 });
+      const id = service.gauben()[0].id;
+      service.updateGaube(id, { breite: 3 });
+      expect(service.gauben()[0].breite).toBe(3);
+    });
+  });
+
+  // --- Verbindungsmittel ---
+
+  describe('berechneVerbindungsmittel', () => {
+    it('gibt leere Liste für Flachdach zurück', () => {
+      const ergebnis = service.berechneFlachdach(STD_MASSE, []);
+      const vm = service.berechneVerbindungsmittel(ergebnis, STD_MASSE);
+      expect(vm.positionen.length).toBe(0);
+    });
+
+    it('enthält Sparrennägel, Lattennägel, Sturmklammern und Firstnägel für Satteldach', () => {
+      const ergebnis = service.berechneSatteldach(STD_MASSE, []);
+      const vm = service.berechneVerbindungsmittel(ergebnis, STD_MASSE);
+      const bezeichnungen = vm.positionen.map(p => p.bezeichnung);
+      expect(bezeichnungen).toContain('Sparrennägel');
+      expect(bezeichnungen).toContain('Lattennägel');
+      expect(bezeichnungen).toContain('Sturmklammern');
+      expect(bezeichnungen).toContain('Firstnägel');
+    });
+
+    it('Sparrennägel = sparrenAnzahl × 6', () => {
+      const ergebnis = service.berechneSatteldach(STD_MASSE, []);
+      const vm = service.berechneVerbindungsmittel(ergebnis, STD_MASSE);
+      const sparrenNaegel = vm.positionen.find(p => p.bezeichnung === 'Sparrennägel')!;
+      expect(sparrenNaegel.anzahl).toBe(ergebnis.sparrenAnzahl * 6);
+    });
+
+    it('Gewicht ist > 0 wenn Anzahl > 0', () => {
+      const ergebnis = service.berechneSatteldach(STD_MASSE, []);
+      const vm = service.berechneVerbindungsmittel(ergebnis, STD_MASSE);
+      vm.positionen.forEach(p => {
+        expect(p.gewichtKg).toBeGreaterThan(0);
+      });
     });
   });
 });

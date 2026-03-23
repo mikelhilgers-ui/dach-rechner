@@ -32,18 +32,26 @@
 
 ---
 
+### Gauben, Verbindungsmittel (heute)
+- [x] `GaubeConfig` um `id` + `typ` erweitert
+- [x] `GaubenEingabeComponent` – Gauben/Dachfenster hinzufügen, bearbeiten, entfernen
+- [x] `VerbindungsmittelErgebnis` Model + Berechnung im Service (Sparrennägel, Lattennägel, Sturmklammern, Firstnägel)
+- [x] `VerbindungsmittelComponent` – Tabelle mit Anzahl + kg-Gewicht
+- [x] Calculator-Layout um beide Sektionen erweitert
+- [x] 33/33 Tests grün ✅
+
+---
+
 ## 🚧 In Arbeit
 
 ---
 
 ## 📋 Nächste Schritte (Sprint 1)
 
-1. Verbindungsmittel-Tab
-2. Gauben & Dachfenster
-3. Preiskalkulation
-4. PDF Export (jsPDF)
-5. Excel Export (SheetJS)
-6. Canvas-Visualisierung (optional)
+1. Preiskalkulation
+2. PDF Export (jsPDF)
+3. Excel Export (SheetJS)
+4. Canvas-Visualisierung (optional)
 
 ---
 

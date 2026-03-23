@@ -10,9 +10,12 @@ export interface DachMasse {
 }
 
 export interface GaubeConfig {
+  id: string;
+  typ: 'gaube' | 'dachfenster';
   breite: number;            // m
   hoehe: number;             // m
   anzahl: number;
+  bezeichnung?: string;
 }
 
 export interface DachErgebnis {
@@ -25,6 +28,18 @@ export interface DachErgebnis {
   traufLaenge: number;       // m
   kehlLaenge: number;        // m (bei Walm)
   gratLaenge: number;        // m (bei Walm)
+}
+
+export interface VerbindungsmittelPosition {
+  bezeichnung: string;       // z.B. "Sparrennägel 4.5×120"
+  dimension: string;         // z.B. "4.5 × 120 mm"
+  anzahl: number;
+  gewichtKg: number;         // ca. Gewicht (für Bestellung)
+  hinweis?: string;
+}
+
+export interface VerbindungsmittelErgebnis {
+  positionen: VerbindungsmittelPosition[];
 }
 
 export interface CalculatorState {
