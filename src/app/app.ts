@@ -17,19 +17,37 @@ export class App {
     (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
   );
 
+  installPrompt = signal<any>(null);
+
   constructor() {
-    // Apply class immediately on init
     document.documentElement.classList.toggle('dark', this.darkMode());
 
-    // Keep in sync on every change
     effect(() => {
-      const dark = this.darkMode();
-      document.documentElement.classList.toggle('dark', dark);
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', this.darkMode());
+      localStorage.setItem('theme', this.darkMode() ? 'dark' : 'light');
+    });
+
+    // PWA Install-Prompt abfangen
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      this.installPrompt.set(e);
+    });
+
+    // Nach erfolgreicher Installation Button ausblenden
+    window.addEventListener('appinstalled', () => {
+      this.installPrompt.set(null);
     });
   }
 
   toggleTheme(): void {
     this.darkMode.update(v => !v);
+  }
+
+  async installApp(): Promise<void> {
+    const prompt = this.installPrompt();
+    if (!prompt) return;
+    prompt.prompt();
+    const { outcome } = await prompt.userChoice;
+    if (outcome === 'accepted') this.installPrompt.set(null);
   }
 }

@@ -5,6 +5,14 @@
 
   <span class="toolbar-spacer"></span>
 
+  @if (installPrompt()) {
+    <button mat-stroked-button class="install-btn" (click)="installApp()"
+            matTooltip="Als App auf dem Gerät installieren">
+      <mat-icon>install_mobile</mat-icon>
+      <span class="install-label">App installieren</span>
+    </button>
+  }
+
   <button mat-icon-button (click)="toggleTheme()"
           [matTooltip]="darkMode() ? 'Light Mode' : 'Dark Mode'"
           class="theme-toggle">

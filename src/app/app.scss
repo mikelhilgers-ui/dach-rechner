@@ -39,6 +39,18 @@
     flex: 1;
   }
 
+  .install-btn {
+    margin-right: 4px;
+    border-color: rgba(255,255,255,0.5);
+    color: white;
+    font-size: 13px;
+
+    .install-label {
+      display: none;
+      @media (min-width: 600px) { display: inline; }
+    }
+  }
+
   .theme-toggle {
     opacity: 0.85;
 
