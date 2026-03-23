@@ -114,7 +114,7 @@ interface PreisZeile {
     </form>
   `,
   styles: [`
-    .preis-form { display: flex; flex-direction: column; gap: 16px; }
+    .preis-form { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
 
     .preis-inputs {
       display: grid;
