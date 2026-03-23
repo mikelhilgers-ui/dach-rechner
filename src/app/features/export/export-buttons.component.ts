@@ -46,8 +46,13 @@ import { PdfExportService } from './pdf-export.service';
 
     .export-inputs {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0 16px;
+      grid-template-columns: 1fr;
+      gap: 0;
+
+      @media (min-width: 600px) {
+        grid-template-columns: 1fr 1fr;
+        gap: 0 16px;
+      }
     }
 
     .export-field { width: 100%; }
