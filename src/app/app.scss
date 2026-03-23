@@ -4,6 +4,14 @@
   top: 0;
   z-index: 100;
 
+  // Light: Slate-Primärfarbe (via Material)
+  // Dark: tiefes Anthrazit mit Trennlinie
+  html.dark & {
+    background-color: #1a2428 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: #dde3e6 !important;
+  }
+
   .toolbar-logo {
     font-size: 28px;
     width: 28px;

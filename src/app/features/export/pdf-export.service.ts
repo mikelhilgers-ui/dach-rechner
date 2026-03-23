@@ -5,15 +5,15 @@ import { CalculatorService } from '../../core/calculator/calculator.service';
 type RGB = [number, number, number];
 
 const C = {
-  primary:   [30, 115, 190] as RGB,
-  dark:      [25, 25, 25]   as RGB,
-  mid:       [80, 80, 80]   as RGB,
+  primary:   [69,  90, 100] as RGB,   // Blue-Grey 800 (Anthrazit)
+  dark:      [25,  25,  25] as RGB,
+  mid:       [80,  80,  80] as RGB,
   light:     [150, 150, 150]as RGB,
-  rowAlt:    [246, 249, 253]as RGB,
-  headBg:    [220, 234, 248]as RGB,
+  rowAlt:    [247, 248, 249]as RGB,
+  headBg:    [207, 216, 220]as RGB,   // Blue-Grey 100
   white:     [255, 255, 255]as RGB,
-  totalBg:   [30, 115, 190] as RGB,
-  sectionBg: [240, 245, 252]as RGB,
+  totalBg:   [55,  71,  79] as RGB,   // Blue-Grey 900
+  sectionBg: [240, 242, 244]as RGB,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -112,11 +112,11 @@ export class PdfExportService {
     fill(0, 0, PW, 30, C.primary);
     // Logo-Text
     txt('DachRechner', ML, 13, 20, 'bold', C.white);
-    txt('dachrechner.at', ML, 20, 8, 'normal', [180, 210, 240] as RGB);
+    txt('dach-rechner.vercel.app', ML, 20, 8, 'normal', [144, 164, 174] as RGB);
     // Firma + Datum rechts
     if (firmenname) txt(firmenname, PW - MR, 11, 11, 'bold', C.white, 'right');
-    txt(datum, PW - MR, 18, 8, 'normal', [180, 210, 240] as RGB, 'right');
-    txt('Erstellt mit DachRechner', PW - MR, 24, 7, 'normal', [150, 190, 230] as RGB, 'right');
+    txt(datum, PW - MR, 18, 8, 'normal', [144, 164, 174] as RGB, 'right');
+    txt('Erstellt mit DachRechner', PW - MR, 24, 7, 'normal', [120, 144, 156] as RGB, 'right');
 
     y = 36;
 
@@ -252,7 +252,7 @@ export class PdfExportService {
     for (let i = 1; i <= pages; i++) {
       doc.setPage(i);
       hline(ML, 287, ML + CW, C.light, 0.2);
-      txt(`DachRechner · dachrechner.at`, ML, 292, 6.5, 'normal', C.light);
+      txt(`DachRechner · dach-rechner.vercel.app`, ML, 292, 6.5, 'normal', C.light);
       txt(`Seite ${i} / ${pages}`, ML + CW, 292, 6.5, 'normal', C.light, 'right');
     }
 
