@@ -59,6 +59,7 @@ export class CalculatorService {
     eindeckungPreisProM2:         40,
     unterdeckbahnPreisProM2:       2,
     daemmungPreisProM2:           18,
+    dampfbremsePreisProM2:         2,
     verbindungsmittelPreisProKg:   4,
     arbeitskostenProM2:           35,
     aufschlagProzent:             15,
@@ -438,14 +439,14 @@ export class CalculatorService {
       });
     }
 
-    // Dampfbremse (pauschal wie Unterdeckbahn)
+    // Dampfbremse
     if (dachaufbau.dampfbremse) {
       positionen.push({
         bezeichnung: 'Dampfbremse',
         menge: dachaufbau.dampfbremse.flaecheM2,
         einheit: 'm²',
-        preisProEinheit: cfg.unterdeckbahnPreisProM2,
-        gesamt: Math.round(dachaufbau.dampfbremse.flaecheM2 * cfg.unterdeckbahnPreisProM2),
+        preisProEinheit: cfg.dampfbremsePreisProM2,
+        gesamt: Math.round(dachaufbau.dampfbremse.flaecheM2 * cfg.dampfbremsePreisProM2),
       });
     }
 

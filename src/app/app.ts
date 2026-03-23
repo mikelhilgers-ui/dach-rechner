@@ -14,7 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class App {
   darkMode = signal(
     localStorage.getItem('theme') === 'dark' ||
-    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    (!localStorage.getItem('theme') && !!window.matchMedia?.('(prefers-color-scheme: dark)').matches)
   );
 
   installPrompt = signal<any>(null);

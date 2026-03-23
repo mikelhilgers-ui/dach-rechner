@@ -121,6 +121,7 @@ export interface PreisConfig {
   eindeckungPreisProM2: number;    // €/m² Eindeckung
   unterdeckbahnPreisProM2: number; // €/m²
   daemmungPreisProM2: number;      // €/m² (inkl. Verlegung)
+  dampfbremsePreisProM2: number;   // €/m²
   verbindungsmittelPreisProKg: number; // €/kg
   arbeitskostenProM2: number;      // €/m² Dachfläche (Lohn)
   aufschlagProzent: number;        // % Gewinn/Overhead
