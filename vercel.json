@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd dachrechner-app && npm install && npm run build -- --configuration production",
+  "outputDirectory": "dachrechner-app/dist/dachrechner-app/browser",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
