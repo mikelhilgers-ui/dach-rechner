@@ -105,7 +105,7 @@ interface PreisZeile {
 
         <p class="preis-hinweis">
           <mat-icon>info_outline</mat-icon>
-          Richtwerte für Österreich. Preise je nach Region und Saison anpassen.
+          Richtpreise. Je nach Region und Saison anpassen.
         </p>
       } @else {
         <p class="preis-leer">Bitte zuerst Dachmaße eingeben.</p>
