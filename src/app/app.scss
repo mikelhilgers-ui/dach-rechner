@@ -41,9 +41,15 @@
 
   .install-btn {
     margin-right: 4px;
-    border-color: rgba(255,255,255,0.5);
-    color: white;
     font-size: 13px;
+    border-color: rgba(255,255,255,0.6);
+    color: white;
+
+    // Light Mode: Toolbar ist hell → dunkler Button
+    html:not(.dark) & {
+      border-color: rgba(0,0,0,0.3);
+      color: rgba(0,0,0,0.75);
+    }
 
     .install-label {
       display: none;
