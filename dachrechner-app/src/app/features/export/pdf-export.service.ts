@@ -2,234 +2,261 @@ import { Injectable, inject } from '@angular/core';
 import jsPDF from 'jspdf';
 import { CalculatorService } from '../../core/calculator/calculator.service';
 
+type RGB = [number, number, number];
+
+const C = {
+  primary:   [69,  90, 100] as RGB,   // Blue-Grey 800 (Anthrazit)
+  dark:      [25,  25,  25] as RGB,
+  mid:       [80,  80,  80] as RGB,
+  light:     [150, 150, 150]as RGB,
+  rowAlt:    [247, 248, 249]as RGB,
+  headBg:    [207, 216, 220]as RGB,   // Blue-Grey 100
+  white:     [255, 255, 255]as RGB,
+  totalBg:   [55,  71,  79] as RGB,   // Blue-Grey 900
+  sectionBg: [240, 242, 244]as RGB,
+};
+
 @Injectable({ providedIn: 'root' })
 export class PdfExportService {
   private calc = inject(CalculatorService);
 
   exportieren(firmenname = '', projektname = ''): void {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const W = 210;
-    const margin = 15;
-    const contentW = W - margin * 2;
-    let y = margin;
+    const PW = 210;
+    const ML = 14, MR = 14;
+    const CW = PW - ML - MR;
+    let y = 0;
 
-    const dachformLabels: Record<string, string> = {
+    const datum = new Date().toLocaleDateString('de-AT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const dachformLabel: Record<string, string> = {
       sattel: 'Satteldach', pult: 'Pultdach', walm: 'Walmdach', flach: 'Flachdach',
     };
 
-    // --- Farben ---
-    type RGB = [number, number, number];
-    const PRIMARY: RGB = [30, 115, 190];
-    const DARK:    RGB = [30, 30, 30];
-    const GREY:    RGB = [100, 100, 100];
-    const LIGHT:   RGB = [245, 247, 250];
-    const WHITE:   RGB = [255, 255, 255];
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
-    // --- Hilfsfunktionen ---
-    const setFont = (size: number, style: 'normal' | 'bold' = 'normal', color: RGB = DARK) => {
-      doc.setFontSize(size);
-      doc.setFont('helvetica', style);
-      doc.setTextColor(...color);
+    const rgb  = (c: RGB) => c;
+    const fill = (x: number, ry: number, w: number, h: number, c: RGB) => {
+      doc.setFillColor(...rgb(c)); doc.rect(x, ry, w, h, 'F');
+    };
+    const stroke = (x: number, ry: number, w: number, h: number, c: RGB, lw = 0.2) => {
+      doc.setDrawColor(...rgb(c)); doc.setLineWidth(lw); doc.rect(x, ry, w, h, 'S');
+    };
+    const hline = (x1: number, ry: number, x2: number, c: RGB, lw = 0.2) => {
+      doc.setDrawColor(...rgb(c)); doc.setLineWidth(lw); doc.line(x1, ry, x2, ry);
+    };
+    const txt = (text: string, x: number, ry: number, size: number, style: 'normal'|'bold', c: RGB, align: 'left'|'center'|'right' = 'left') => {
+      doc.setFontSize(size); doc.setFont('helvetica', style); doc.setTextColor(...rgb(c));
+      doc.text(text, x, ry, { align });
+    };
+    const fmt  = (n: number, dec = 1) => n.toLocaleString('de-AT', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    const euro = (n: number) => n.toLocaleString('de-AT', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' €';
+
+    const newPage = () => { doc.addPage(); y = 16; };
+    const checkY = (need = 20) => { if (y > 275 - need) newPage(); };
+
+    // ── Section heading ──────────────────────────────────────────────────────
+    const section = (label: string) => {
+      checkY(14);
+      fill(ML, y, CW, 7, C.sectionBg);
+      stroke(ML, y, CW, 7, C.primary, 0.15);
+      txt(label, ML + 3, y + 5, 8.5, 'bold', C.primary);
+      y += 13;
     };
 
-    const line = (x1: number, y1: number, x2: number, y2: number, color: RGB = GREY, lw = 0.3) => {
-      doc.setDrawColor(...color);
-      doc.setLineWidth(lw);
-      doc.line(x1, y1, x2, y2);
+    // ── Generic table ────────────────────────────────────────────────────────
+    interface Col { w: number; align?: 'left'|'right'|'center' }
+    const ROW_H = 6.5;
+
+    const tableHeader = (cols: Col[], labels: string[]) => {
+      fill(ML, y, CW, ROW_H, C.headBg);
+      stroke(ML, y, CW, ROW_H, C.primary, 0.15);
+      let x = ML;
+      labels.forEach((lbl, i) => {
+        const align = cols[i]?.align ?? 'left';
+        const tx = align === 'right' ? x + cols[i].w - 2 : x + 2;
+        txt(lbl, tx, y + 4.5, 7.5, 'bold', C.primary, align);
+        x += cols[i].w;
+      });
+      y += ROW_H;
     };
 
-    const fillRect = (x: number, ry: number, w: number, h: number, color: RGB) => {
-      doc.setFillColor(...color);
-      doc.rect(x, ry, w, h, 'F');
+    const tableRow = (cols: Col[], cells: string[], alt = false, bold = false) => {
+      if (alt) fill(ML, y, CW, ROW_H, C.rowAlt);
+      hline(ML, y + ROW_H, ML + CW, C.light, 0.15);
+      let x = ML;
+      cells.forEach((cell, i) => {
+        const align = cols[i]?.align ?? 'left';
+        const tx = align === 'right' ? x + cols[i].w - 2 : x + 2;
+        txt(cell, tx, y + 4.5, 8, bold ? 'bold' : 'normal', C.dark, align);
+        x += cols[i].w;
+      });
+      y += ROW_H;
     };
 
-    const fmt = (n: number, dec = 1) => n.toLocaleString('de-AT', { minimumFractionDigits: dec, maximumFractionDigits: dec });
-    const fmtEuro = (n: number) => n.toLocaleString('de-AT', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' €';
+    const tableSumRow = (label: string, value: string) => {
+      hline(ML, y, ML + CW, C.primary, 0.4);
+      txt(label, ML + 2, y + 4.5, 8.5, 'bold', C.dark);
+      txt(value, ML + CW - 2, y + 4.5, 8.5, 'bold', C.dark, 'right');
+      y += ROW_H;
+    };
 
-    // --- Header ---
-    fillRect(0, 0, W, 28, PRIMARY);
-    setFont(18, 'bold', WHITE);
-    doc.text('DachRechner', margin, 12);
-    setFont(9, 'normal', [200, 220, 240]);
-    doc.text('Dachflächen-Rechner für Zimmerer  ·  dachrechner.at', margin, 18);
+    const kv = (label: string, value: string) => {
+      txt(label, ML + 2, y, 8, 'normal', C.mid);
+      txt(value, ML + CW - 2, y, 8, 'bold', C.dark, 'right');
+      y += 5.5;
+    };
 
-    if (firmenname) {
-      setFont(10, 'bold', WHITE);
-      doc.text(firmenname, W - margin, 12, { align: 'right' });
-    }
+    // ═══════════════════════════════════════════════════════════════════════
+    // HEADER
+    // ═══════════════════════════════════════════════════════════════════════
+    fill(0, 0, PW, 30, C.primary);
+    // Logo-Text
+    txt('DachRechner', ML, 13, 20, 'bold', C.white);
+    txt('dach-rechner.vercel.app', ML, 20, 8, 'normal', [144, 164, 174] as RGB);
+    // Firma + Datum rechts
+    if (firmenname) txt(firmenname, PW - MR, 11, 11, 'bold', C.white, 'right');
+    txt(datum, PW - MR, 18, 8, 'normal', [144, 164, 174] as RGB, 'right');
+    txt('Erstellt mit DachRechner', PW - MR, 24, 7, 'normal', [120, 144, 156] as RGB, 'right');
 
-    const datum = new Date().toLocaleDateString('de-AT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    setFont(8, 'normal', [200, 220, 240]);
-    doc.text(`Erstellt: ${datum}`, W - margin, 18, { align: 'right' });
+    y = 36;
 
-    y = 35;
-
-    // Projekttitel
+    // Projektname
     if (projektname) {
-      setFont(13, 'bold');
-      doc.text(projektname, margin, y);
-      y += 7;
+      txt(projektname, ML, y, 13, 'bold', C.dark); y += 7;
     }
-
-    setFont(11, 'bold');
-    doc.text(`${dachformLabels[this.calc.dachform()] ?? ''} · Berechnung`, margin, y);
-    y += 3;
-    line(margin, y, W - margin, y, PRIMARY, 0.5);
+    txt(`${dachformLabel[this.calc.dachform()] ?? ''} – Berechnung`, ML, y, 11, 'bold', C.mid);
+    y += 2;
+    hline(ML, y, ML + CW, C.primary, 0.5);
     y += 6;
 
-    // --- Abschnitt rendern ---
-    const sectionHeader = (titel: string) => {
-      fillRect(margin, y, contentW, 7, LIGHT);
-      setFont(9, 'bold', PRIMARY);
-      doc.text(titel.toUpperCase(), margin + 2, y + 5);
-      y += 9;
-    };
-
-    const twoCol = (label: string, value: string) => {
-      setFont(9, 'normal', GREY);
-      doc.text(label, margin + 2, y);
-      setFont(9, 'bold', DARK);
-      doc.text(value, W - margin, y, { align: 'right' });
-      y += 5.5;
-    };
-
-    const tableRow = (cols: string[], widths: number[], bold = false, bgColor?: RGB) => {
-      if (bgColor) fillRect(margin, y - 4, contentW, 5.5, bgColor);
-      let x = margin + 2;
-      setFont(9, bold ? 'bold' : 'normal', DARK);
-      cols.forEach((col, i) => {
-        const align = i > 0 ? 'right' : 'left';
-        const colX = i === 0 ? x : margin + widths.slice(0, i + 1).reduce((a, b) => a + b, 0) - 2;
-        doc.text(col, colX, y, { align });
-      });
-      y += 5.5;
-    };
-
-    const checkPageBreak = (needed = 30) => {
-      if (y > 270 - needed) {
-        doc.addPage();
-        y = margin;
-      }
-    };
-
-    // --- 1. Dachgeometrie ---
-    sectionHeader('Dachgeometrie');
+    // ═══════════════════════════════════════════════════════════════════════
+    // 1. DACHGEOMETRIE
+    // ═══════════════════════════════════════════════════════════════════════
     const e = this.calc.ergebnis();
     const m = this.calc.masse();
-    twoCol('Dachfläche (netto)', `${fmt(e.dachflaeche)} m²`);
-    twoCol('Dachneigung', `${m.dachneigung}°`);
-    twoCol('Trauflänge gesamt', `${fmt(e.traufLaenge)} m`);
+
+    section('1  DACHGEOMETRIE');
+
+    const geoCols: Col[] = [{ w: 80 }, { w: CW - 80, align: 'right' }];
+    kv('Dachfläche (netto)', `${fmt(e.dachflaeche)} m²`);
+    kv('Dachneigung', `${m.dachneigung}°`);
+    kv('Trauflänge gesamt', `${fmt(e.traufLaenge)} m`);
     if (e.sparrenAnzahl > 0) {
-      twoCol('Sparrenlänge', `${fmt(e.sparrenLaenge)} m`);
-      twoCol('Sparren', `${e.sparrenAnzahl} Stk`);
-      twoCol('Dachlatten', `${e.lattenAnzahl} Stk  ·  ${fmt(e.lattenLaenge)} m`);
+      kv('Sparrenlänge', `${fmt(e.sparrenLaenge)} m`);
+      kv('Sparren', `${e.sparrenAnzahl} Stk`);
+      kv('Latten', `${e.lattenAnzahl} Stk · ${fmt(e.lattenLaenge)} m`);
     }
-    if (e.firstLaenge > 0) twoCol('Firstlänge', `${fmt(e.firstLaenge)} m`);
-    if (e.gratLaenge > 0)  twoCol('Gratlänge gesamt', `${fmt(e.gratLaenge)} m`);
+    if (e.firstLaenge > 0) kv('Firstlänge', `${fmt(e.firstLaenge)} m`);
+    if (e.gratLaenge  > 0) kv('Gratlänge gesamt', `${fmt(e.gratLaenge)} m`);
 
     const gauben = this.calc.gauben();
     if (gauben.length > 0) {
       y += 2;
-      setFont(8, 'normal', GREY);
-      doc.text(`Gauben/Dachfenster: ${gauben.length} Position(en), Flächenabzug ${fmt(this.calc.gaubenFlaeche(gauben))} m²`, margin + 2, y);
-      y += 6;
+      txt(`Gauben/Dachfenster: ${gauben.length} Pos., Abzug ${fmt(this.calc.gaubenFlaeche(gauben))} m²`, ML + 2, y, 7.5, 'normal', C.light);
+      y += 5;
     }
 
-    checkPageBreak();
-
-    // --- 2. Holzmenge ---
+    // ═══════════════════════════════════════════════════════════════════════
+    // 2. HOLZ
+    // ═══════════════════════════════════════════════════════════════════════
     const holz = this.calc.holzErgebnis();
     if (holz.positionen.length > 0) {
-      y += 3;
-      sectionHeader('Holz / Unterkonstruktion');
-      const hw = [80, 30, 30, 30];
-      tableRow(['Position', 'Stk', 'lfm', 'm³'], hw, true, LIGHT);
-      for (const p of holz.positionen) {
-        tableRow([p.bezeichnung, `${p.stueck}`, `${fmt(p.lfdm)}`, `${fmt(p.m3, 2)}`], hw);
-      }
-      line(margin, y - 1, W - margin, y - 1);
-      tableRow(['Gesamt', '', '', `${fmt(holz.gesamtM3, 2)} m³  (~${holz.gesamtKg} kg)`], hw, true);
-      checkPageBreak();
+      checkY(holz.positionen.length * ROW_H + 25);
+      y += 4;
+      section('2  HOLZ / UNTERKONSTRUKTION');
+      const hCols: Col[] = [{ w: 65 }, { w: 25, align: 'right' }, { w: 27, align: 'right' }, { w: 27, align: 'right' }, { w: CW - 144, align: 'right' }];
+      tableHeader(hCols, ['Position', 'Stk', 'lfm', 'm³', 'ca. kg']);
+      holz.positionen.forEach((p, i) =>
+        tableRow(hCols, [p.bezeichnung, `${p.stueck}`, `${fmt(p.lfdm)}`, `${fmt(p.m3, 2)}`, `${p.gewichtKg}`], i % 2 === 0)
+      );
+      tableSumRow('Gesamt', `${fmt(holz.gesamtM3, 2)} m³  ·  ~${holz.gesamtKg} kg`);
     }
 
-    // --- 3. Eindeckung ---
-    y += 3;
-    sectionHeader('Eindeckung');
+    // ═══════════════════════════════════════════════════════════════════════
+    // 3. EINDECKUNG
+    // ═══════════════════════════════════════════════════════════════════════
+    checkY(25);
+    y += 4;
+    section('3  EINDECKUNG');
     const eindeckung = this.calc.eindeckungErgebnis();
-    twoCol('Material', eindeckung.material);
-    twoCol('Bedarf (inkl. Zuschlag)', `${fmt(eindeckung.flaecheBrutto)} m²`);
-    if (eindeckung.stueck) twoCol('Stückzahl', `${eindeckung.stueck.toLocaleString('de-AT')} Stk`);
+    kv('Material', eindeckung.material);
+    kv('Bedarf (inkl. Zuschlag)', `${fmt(eindeckung.flaecheBrutto)} m²`);
+    if (eindeckung.stueck) kv('Stückzahl', `${eindeckung.stueck.toLocaleString('de-AT')} Stk`);
     if (eindeckung.hinweis) {
-      setFont(8, 'normal', GREY);
-      doc.text(`Hinweis: ${eindeckung.hinweis}`, margin + 2, y);
+      txt(`Hinweis: ${eindeckung.hinweis}`, ML + 2, y, 7, 'normal', C.light);
       y += 5;
     }
 
-    // --- 4. Dachaufbau ---
+    // ═══════════════════════════════════════════════════════════════════════
+    // 4. DACHAUFBAU
+    // ═══════════════════════════════════════════════════════════════════════
     const aufbau = this.calc.dachaufbauErgebnis();
     if (aufbau.unterdeckbahn || aufbau.daemmung || aufbau.dampfbremse) {
-      checkPageBreak();
-      y += 3;
-      sectionHeader('Dachaufbau');
-      if (aufbau.unterdeckbahn) twoCol('Unterdeckbahn', `${fmt(aufbau.unterdeckbahn.flaecheBrutto)} m²  (${aufbau.unterdeckbahn.rollen} Rollen)`);
-      if (aufbau.daemmung)      twoCol(aufbau.daemmung.bezeichnung, `${fmt(aufbau.daemmung.flaecheM2)} m²  /  ${fmt(aufbau.daemmung.volumenM3, 2)} m³`);
-      if (aufbau.dampfbremse)   twoCol('Dampfbremse', `${fmt(aufbau.dampfbremse.flaecheM2)} m²`);
+      checkY(25);
+      y += 4;
+      section('4  DACHAUFBAU');
+      if (aufbau.unterdeckbahn) kv('Unterdeckbahn', `${fmt(aufbau.unterdeckbahn.flaecheBrutto)} m²  (${aufbau.unterdeckbahn.rollen} Rollen à 50 m²)`);
+      if (aufbau.daemmung)      kv(aufbau.daemmung.bezeichnung, `${fmt(aufbau.daemmung.flaecheM2)} m²  /  ${fmt(aufbau.daemmung.volumenM3, 2)} m³`);
+      if (aufbau.dampfbremse)   kv('Dampfbremse', `${fmt(aufbau.dampfbremse.flaecheM2)} m²`);
     }
 
-    // --- 5. Verbindungsmittel ---
-    const vm = this.calc.verbindungsmittel();
-    if (vm.positionen.length > 0) {
-      checkPageBreak();
-      y += 3;
-      sectionHeader('Verbindungsmittel');
-      const vw = [80, 40, 30, 20];
-      tableRow(['Position', 'Dimension', 'Anzahl', 'kg'], vw, true, LIGHT);
-      for (const p of vm.positionen) {
-        tableRow([p.bezeichnung, p.dimension, `${p.anzahl.toLocaleString('de-AT')} Stk`, `${fmt(p.gewichtKg)}`], vw);
-      }
-      const vmKg = vm.positionen.reduce((s, p) => s + p.gewichtKg, 0);
-      line(margin, y - 1, W - margin, y - 1);
-      tableRow(['Gesamt', '', '', `${fmt(vmKg)} kg`], vw, true);
-    }
-
-    // --- 6. Preiskalkulation ---
+    // ═══════════════════════════════════════════════════════════════════════
+    // 5. PREISKALKULATION
+    // ═══════════════════════════════════════════════════════════════════════
     const preis = this.calc.preisErgebnis();
     if (preis.positionen.length > 0) {
-      checkPageBreak(60);
-      y += 5;
-      sectionHeader('Preiskalkulation');
-      const pw = [90, 25, 25, 30];
-      tableRow(['Position', 'Menge', '€/Einh.', 'Gesamt'], pw, true, LIGHT);
-      for (const p of preis.positionen) {
-        tableRow([p.bezeichnung, `${fmt(p.menge, 1)} ${p.einheit}`, `${fmt(p.preisProEinheit, 0)}`, fmtEuro(p.gesamt)], pw);
-      }
-      tableRow(['Arbeitskosten', `${fmt(e.dachflaeche, 1)} m²`, `${fmt(preis.arbeitskosten / (e.dachflaeche || 1), 0)}`, fmtEuro(preis.arbeitskosten)], pw);
-      line(margin, y - 1, W - margin, y - 1);
-      tableRow(['Zwischensumme', '', '', fmtEuro(preis.subtotal)], pw, true);
-      tableRow([`Aufschlag (${this.calc.preisConfig().aufschlagProzent} %)`, '', '', fmtEuro(preis.aufschlag)], pw);
-      line(margin, y - 1, W - margin, y - 1, PRIMARY, 0.5);
-      tableRow(['Gesamt netto', '', '', fmtEuro(preis.gesamtNetto)], pw, true);
-      tableRow([`MwSt. ${preis.mwstSatz} %`, '', '', fmtEuro(preis.gesamtBrutto - preis.gesamtNetto)], pw);
+      checkY(preis.positionen.length * ROW_H + 60);
+      y += 4;
+      section('5  PREISKALKULATION');
+
+      const pCols: Col[] = [{ w: 88 }, { w: 28, align: 'right' }, { w: 30, align: 'right' }, { w: CW - 146, align: 'right' }];
+      tableHeader(pCols, ['Position', 'Menge', '€ / Einheit', 'Gesamt']);
+
+      preis.positionen.forEach((p, i) =>
+        tableRow(pCols, [p.bezeichnung, `${fmt(p.menge, 1)} ${p.einheit}`, `${fmt(p.preisProEinheit, 0)} €`, euro(p.gesamt)], i % 2 === 0)
+      );
+      tableRow(pCols,
+        ['Arbeitskosten', `${fmt(e.dachflaeche, 1)} m²`, `${this.calc.preisConfig().arbeitskostenProM2} €/m²`, euro(preis.arbeitskosten)],
+        preis.positionen.length % 2 === 0, false
+      );
+
+      y += 4;
+      tableSumRow('Zwischensumme', euro(preis.subtotal));
+      y += 1;
+      txt(`Aufschlag (${this.calc.preisConfig().aufschlagProzent} %)`, ML + 2, y + 4.5, 8, 'normal', C.mid);
+      txt(euro(preis.aufschlag), ML + CW - 2, y + 4.5, 8, 'bold', C.dark, 'right');
+      y += 7;
+      hline(ML, y, ML + CW, C.primary, 0.4);
+      y += 6;
+      txt('Gesamt netto', ML + 2, y + 4.5, 8.5, 'bold', C.dark);
+      txt(euro(preis.gesamtNetto), ML + CW - 2, y + 4.5, 8.5, 'bold', C.dark, 'right');
+      y += 7;
+      txt(`MwSt. ${preis.mwstSatz} %`, ML + 2, y + 4.5, 8, 'normal', C.mid);
+      txt(euro(preis.gesamtBrutto - preis.gesamtNetto), ML + CW - 2, y + 4.5, 8, 'bold', C.dark, 'right');
+      y += 7;
 
       // Brutto-Box
-      y += 2;
-      fillRect(margin, y, contentW, 10, PRIMARY);
-      setFont(11, 'bold', WHITE);
-      doc.text('Gesamt brutto', margin + 4, y + 7);
-      doc.text(fmtEuro(preis.gesamtBrutto), W - margin - 4, y + 7, { align: 'right' });
-      y += 14;
+      y += 3;
+      checkY(14);
+      fill(ML, y, CW, 12, C.primary);
+      stroke(ML, y, CW, 12, C.primary, 0.3);
+      txt('GESAMT BRUTTO', ML + 4, y + 8, 10, 'bold', C.white);
+      txt(euro(preis.gesamtBrutto), ML + CW - 4, y + 8, 12, 'bold', C.white, 'right');
+      y += 16;
     }
 
-    // --- Footer ---
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
+    // ═══════════════════════════════════════════════════════════════════════
+    // FOOTER auf jeder Seite
+    // ═══════════════════════════════════════════════════════════════════════
+    const pages = doc.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
       doc.setPage(i);
-      setFont(7, 'normal', GREY);
-      doc.text(`Erstellt mit DachRechner · dachrechner.at · Seite ${i}/${pageCount}`, W / 2, 293, { align: 'center' });
-      line(margin, 289, W - margin, 289, GREY, 0.2);
+      hline(ML, 287, ML + CW, C.light, 0.2);
+      txt(`DachRechner · dach-rechner.vercel.app`, ML, 292, 6.5, 'normal', C.light);
+      txt(`Seite ${i} / ${pages}`, ML + CW, 292, 6.5, 'normal', C.light, 'right');
     }
 
-    const dateiname = `DachRechner_${(projektname || dachformLabels[this.calc.dachform()] || 'Dach').replace(/\s+/g, '_')}_${datum.replace(/\./g, '-')}.pdf`;
-    doc.save(dateiname);
+    const name = `DachRechner_${(projektname || dachformLabel[this.calc.dachform()] || 'Dach').replace(/\s+/g, '_')}_${datum.replace(/\./g, '-')}.pdf`;
+    doc.save(name);
   }
 }

@@ -4,6 +4,14 @@
   top: 0;
   z-index: 100;
 
+  // Light: Slate-Primärfarbe (via Material)
+  // Dark: tiefes Anthrazit mit Trennlinie
+  html.dark & {
+    background-color: #1a2428 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: #dde3e6 !important;
+  }
+
   .toolbar-logo {
     font-size: 28px;
     width: 28px;
@@ -24,6 +32,35 @@
 
     @media (min-width: 600px) {
       display: inline;
+    }
+  }
+
+  .toolbar-spacer {
+    flex: 1;
+  }
+
+  .install-btn {
+    margin-right: 4px;
+    font-size: 13px;
+    background-color: white !important;
+    color: #37474f !important;
+
+    html.dark & {
+      background-color: rgba(255,255,255,0.15) !important;
+      color: white !important;
+    }
+
+    .install-label {
+      display: none;
+      @media (min-width: 600px) { display: inline; }
+    }
+  }
+
+  .theme-toggle {
+    opacity: 0.85;
+
+    &:hover {
+      opacity: 1;
     }
   }
 }

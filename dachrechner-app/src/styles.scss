@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 
+// ── Light Theme ────────────────────────────────────────────────────────────
 html {
   height: 100%;
   @include mat.theme((
@@ -10,16 +11,63 @@ html {
     typography: Roboto,
     density: 0,
   ));
+
+  // Slate / Anthrazit – überschreibt das Azure-Blau
+  --mat-sys-primary:                #455a64;
+  --mat-sys-on-primary:             #ffffff;
+  --mat-sys-primary-container:      #cfd8dc;
+  --mat-sys-on-primary-container:   #263238;
+  --mat-sys-secondary:              #546e7a;
+  --mat-sys-on-secondary:           #ffffff;
+  --mat-sys-secondary-container:    #dde5e8;
+  --mat-sys-on-secondary-container: #1c2e35;
+}
+
+// ── Dark Theme ─────────────────────────────────────────────────────────────
+html.dark {
+  @include mat.theme((
+    color: (
+      theme-type: dark,
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+
+  // Primärfarbe (Slate, heller für Dark)
+  --mat-sys-primary:                #90a4ae;
+  --mat-sys-on-primary:             #102027;
+  --mat-sys-primary-container:      #37474f;
+  --mat-sys-on-primary-container:   #cfd8dc;
+  --mat-sys-secondary:              #78909c;
+  --mat-sys-on-secondary:           #1c2e35;
+
+  // Oberflächen – deutlich abgestuft für Tiefe
+  --mat-sys-background:             #0e1416;
+  --mat-sys-on-background:          #dde3e6;
+  --mat-sys-surface:                #0e1416;
+  --mat-sys-on-surface:             #dde3e6;
+  --mat-sys-surface-container-lowest:  #090e10;
+  --mat-sys-surface-container-low:     #161e22;
+  --mat-sys-surface-container:         #1a2428;
+  --mat-sys-surface-container-high:    #212d31;
+  --mat-sys-surface-container-highest: #2b373c;
+  --mat-sys-outline:                rgba(255,255,255,0.12);
+  --mat-sys-outline-variant:        rgba(255,255,255,0.07);
 }
 
 body {
-  color-scheme: light;
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
   margin: 0;
   height: 100%;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+html.dark body  { color-scheme: dark;  }
+html:not(.dark) body { color-scheme: light; }
 
 // CSS Custom Properties
 :root {
@@ -30,8 +78,5 @@ body {
 }
 
 // Utility
-.full-width { width: 100%; }
+.full-width  { width: 100%; }
 .text-center { text-align: center; }
-
-// Responsive breakpoints (Mobile-First)
-// sm: 600px, md: 960px, lg: 1280px

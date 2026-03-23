@@ -6,7 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PdfExportService } from './pdf-export.service';
-import { ExcelExportService } from './excel-export.service';
 
 @Component({
   selector: 'app-export-buttons',
@@ -39,11 +38,6 @@ import { ExcelExportService } from './excel-export.service';
           <mat-icon>picture_as_pdf</mat-icon>
           PDF exportieren
         </button>
-        <button mat-stroked-button color="primary" (click)="exportExcel()" class="export-btn"
-                matTooltip="Alle Werte als Excel-Datei herunterladen">
-          <mat-icon>table_chart</mat-icon>
-          Excel exportieren
-        </button>
       </div>
     </form>
   `,
@@ -52,8 +46,13 @@ import { ExcelExportService } from './excel-export.service';
 
     .export-inputs {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0 16px;
+      grid-template-columns: 1fr;
+      gap: 0;
+
+      @media (min-width: 600px) {
+        grid-template-columns: 1fr 1fr;
+        gap: 0 16px;
+      }
     }
 
     .export-field { width: 100%; }
@@ -74,9 +73,8 @@ import { ExcelExportService } from './excel-export.service';
   `],
 })
 export class ExportButtonsComponent {
-  private pdf   = inject(PdfExportService);
-  private excel = inject(ExcelExportService);
-  private fb    = inject(FormBuilder);
+  private pdf = inject(PdfExportService);
+  private fb  = inject(FormBuilder);
 
   form = this.fb.group({
     firmenname:  [''],
@@ -86,10 +84,5 @@ export class ExportButtonsComponent {
   exportPdf(): void {
     const { firmenname, projektname } = this.form.value;
     this.pdf.exportieren(firmenname ?? '', projektname ?? '');
-  }
-
-  exportExcel(): void {
-    const { firmenname, projektname } = this.form.value;
-    this.excel.exportieren(firmenname ?? '', projektname ?? '');
   }
 }

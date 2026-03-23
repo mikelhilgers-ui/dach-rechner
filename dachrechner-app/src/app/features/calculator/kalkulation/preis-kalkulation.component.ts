@@ -105,7 +105,7 @@ interface PreisZeile {
 
         <p class="preis-hinweis">
           <mat-icon>info_outline</mat-icon>
-          Richtwerte für Österreich. Preise je nach Region und Saison anpassen.
+          Richtpreise. Je nach Region und Saison anpassen.
         </p>
       } @else {
         <p class="preis-leer">Bitte zuerst Dachmaße eingeben.</p>
@@ -114,7 +114,7 @@ interface PreisZeile {
     </form>
   `,
   styles: [`
-    .preis-form { display: flex; flex-direction: column; gap: 16px; }
+    .preis-form { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
 
     .preis-inputs {
       display: grid;
@@ -191,6 +191,7 @@ export class PreisKalkulationComponent {
     { label: 'Eindeckung',     field: 'eindeckungPreisProM2',       einheit: '€/m²',  tooltip: 'Ziegel ca. 30–60 €/m², Schiefer 80–150 €/m²', min: 0, step: 5 },
     { label: 'Unterdeckbahn',  field: 'unterdeckbahnPreisProM2',    einheit: '€/m²',  tooltip: 'Diffusionsoffene Bahn ca. 1.50–3 €/m²', min: 0, step: 0.5 },
     { label: 'Dämmung',        field: 'daemmungPreisProM2',         einheit: '€/m²',  tooltip: 'Mineralwolle 18 cm ca. 12–25 €/m²', min: 0, step: 1 },
+    { label: 'Dampfbremse',    field: 'dampfbremsePreisProM2',      einheit: '€/m²',  tooltip: 'Dampfbremsfolie ca. 1.50–4 €/m²', min: 0, step: 0.5 },
     { label: 'Verbindungsm.',  field: 'verbindungsmittelPreisProKg',einheit: '€/kg',  tooltip: 'Nägel/Schrauben ca. 3–6 €/kg', min: 0, step: 0.5 },
     { label: 'Arbeitskosten',  field: 'arbeitskostenProM2',         einheit: '€/m²',  tooltip: 'Lohnkosten ca. 25–50 €/m² Dachfläche', min: 0, step: 5 },
     { label: 'Aufschlag',      field: 'aufschlagProzent',           einheit: '%',     tooltip: 'Gewinn + Overhead, typisch 10–20 %', min: 0, step: 1 },
@@ -201,6 +202,7 @@ export class PreisKalkulationComponent {
     eindeckungPreisProM2:        [40],
     unterdeckbahnPreisProM2:     [2],
     daemmungPreisProM2:          [18],
+    dampfbremsePreisProM2:       [2],
     verbindungsmittelPreisProKg: [4],
     arbeitskostenProM2:          [35],
     aufschlagProzent:            [15],
@@ -213,6 +215,7 @@ export class PreisKalkulationComponent {
         eindeckungPreisProM2:        v.eindeckungPreisProM2        ?? 40,
         unterdeckbahnPreisProM2:     v.unterdeckbahnPreisProM2     ?? 2,
         daemmungPreisProM2:          v.daemmungPreisProM2          ?? 18,
+        dampfbremsePreisProM2:       v.dampfbremsePreisProM2       ?? 2,
         verbindungsmittelPreisProKg: v.verbindungsmittelPreisProKg ?? 4,
         arbeitskostenProM2:          v.arbeitskostenProM2          ?? 35,
         aufschlagProzent:            v.aufschlagProzent            ?? 15,

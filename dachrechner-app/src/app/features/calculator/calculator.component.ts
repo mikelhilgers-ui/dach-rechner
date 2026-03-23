@@ -7,7 +7,6 @@ import { GaubenEingabeComponent } from './gauben/gauben-eingabe.component';
 import { HolzEingabeComponent } from './holz/holz-eingabe.component';
 import { EindeckungEingabeComponent } from './kalkulation/eindeckung-eingabe.component';
 import { DachaufbauEingabeComponent } from './kalkulation/dachaufbau-eingabe.component';
-import { VerbindungsmittelComponent } from './verbindungsmittel/verbindungsmittel.component';
 import { PreisKalkulationComponent } from './kalkulation/preis-kalkulation.component';
 import { ExportButtonsComponent } from '../export/export-buttons.component';
 import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
@@ -23,7 +22,6 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
     HolzEingabeComponent,
     EindeckungEingabeComponent,
     DachaufbauEingabeComponent,
-    VerbindungsmittelComponent,
     PreisKalkulationComponent,
     ExportButtonsComponent,
     ErgebnisPanelComponent,
@@ -102,21 +100,10 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
           <mat-card-header>
             <mat-icon mat-card-avatar>euro</mat-icon>
             <mat-card-title>Preiskalkulation</mat-card-title>
-            <mat-card-subtitle>Materialpreise anpassen → Angebotspreis</mat-card-subtitle>
+            <mat-card-subtitle>Material, Verbindungsmittel, Arbeitskosten → Angebotspreis</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <app-preis-kalkulation />
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="eingabe-card">
-          <mat-card-header>
-            <mat-icon mat-card-avatar>hardware</mat-icon>
-            <mat-card-title>Verbindungsmittel</mat-card-title>
-            <mat-card-subtitle>Automatisch berechnet</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <app-verbindungsmittel />
           </mat-card-content>
         </mat-card>
 
@@ -124,7 +111,7 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
           <mat-card-header>
             <mat-icon mat-card-avatar>download</mat-icon>
             <mat-card-title>Export</mat-card-title>
-            <mat-card-subtitle>PDF oder Excel herunterladen</mat-card-subtitle>
+            <mat-card-subtitle>PDF herunterladen</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <app-export-buttons />
@@ -157,7 +144,7 @@ import { ErgebnisPanelComponent } from './results/ergebnis-panel.component';
     .calculator-eingabe {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 24px;
     }
 
     .eingabe-card {

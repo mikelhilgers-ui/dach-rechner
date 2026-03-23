@@ -17,7 +17,7 @@
   - Satteldach, Pultdach, Walmdach, Flachdach
   - Sparren, Latten, Flächen, Grat, Kehl
   - Gauben-Abzug
-- [x] `calculator.service.spec.ts` – 25 Unit Tests, alle grün ✅
+- [x] `calculator.service.spec.ts` – 44 Unit Tests, alle grün ✅
 
 ---
 
@@ -28,45 +28,55 @@
 - [x] `MasseEingabeComponent` – reaktives Formular, Validierung, Formularfelder je Dachform
 - [x] `ErgebnisPanelComponent` – Live-Ergebnis via Signals, sticky auf Desktop
 - [x] `CalculatorComponent` – 2-Spalten-Layout (Eingabe | Ergebnis)
-- [x] Build fehlerfrei, 25/25 Tests grün ✅
 
 ---
 
-### Gauben, Verbindungsmittel (heute)
+### Gauben, Verbindungsmittel
 - [x] `GaubeConfig` um `id` + `typ` erweitert
 - [x] `GaubenEingabeComponent` – Gauben/Dachfenster hinzufügen, bearbeiten, entfernen
-- [x] `VerbindungsmittelErgebnis` Model + Berechnung im Service (Sparrennägel, Lattennägel, Sturmklammern, Firstnägel)
-- [x] `VerbindungsmittelComponent` – Tabelle mit Anzahl + kg-Gewicht
-- [x] Calculator-Layout um beide Sektionen erweitert
-- [x] 33/33 Tests grün ✅
+- [x] `VerbindungsmittelErgebnis` Model + Berechnung im Service
+- [x] Verbindungsmittel direkt in Preiskalkulation integriert (kein eigener Card)
 
 ---
 
-### Holz, Eindeckung, Dachaufbau (heute)
+### Holz, Eindeckung, Dachaufbau
 - [x] `HolzConfig` + `berechneHolz()`: Sparren/Latten/Konterlatte → lfdm, m³, kg
 - [x] `EindeckungConfig` + `berechneEindeckung()`: 7 Materialien, Stückzahl, Zuschlag
 - [x] `DachaufbauConfig` + `berechneDachaufbau()`: Unterdeckbahn, Dämmung, Dampfbremse
-- [x] `HolzEingabeComponent`: Querschnitt-Auswahl + Live-Vorschau m³/kg
-- [x] `EindeckungEingabeComponent`: Materialauswahl + Live-Ergebnis
-- [x] `DachaufbauEingabeComponent`: Toggles für alle 3 Schichten
-- [x] Ergebnis-Panel: alle Materialien in Sektionen
-- [x] 44/44 Tests grün ✅
+- [x] `HolzEingabeComponent`, `EindeckungEingabeComponent`, `DachaufbauEingabeComponent`
 
 ---
 
-### Preiskalkulation + Export (heute)
+### Preiskalkulation + PDF Export
 - [x] `PreisConfig` + `berechnePreise()`: Material, Arbeit, Aufschlag, MwSt.
-- [x] `PreisKalkulationComponent`: 7 editierbare Preise → Live-Kalkulation mit Brutto-Summe
-- [x] `PdfExportService` (jsPDF): mehrseitiges PDF, alle Sektionen, Firmenname, Brutto-Box
-- [x] `ExcelExportService` (SheetJS): 3 Blätter (Übersicht, Materialien, Preiskalkulation)
-- [x] `ExportButtonsComponent`: Firmenname + Projektname, PDF/Excel Download
+- [x] Dampfbremse hat eigenen Preis (`dampfbremsePreisProM2`)
+- [x] `PreisKalkulationComponent`: 8 editierbare Preise → Live-Kalkulation mit Brutto-Summe
+- [x] `PdfExportService` (jsPDF): mehrseitiges PDF, alle Sektionen, Anthrazit-Design
+- [x] Excel Export entfernt (würde Tool überflüssig machen)
+- [x] `ExportButtonsComponent`: Firmenname + Projektname, PDF Download
 - [x] 44/44 Tests grün ✅
 
 ---
 
-## ✅ Sprint 1 – ABGESCHLOSSEN
+### Design & UX
+- [x] Dark / Light Mode Toggle (speichert in localStorage, erkennt System-Preference)
+- [x] Farbschema Anthrazit/Slate (statt Blau)
+- [x] PWA Icon (Haus-Silhouette, alle Größen 72–512px)
+- [x] "App installieren" Button in Toolbar (Android/Chrome/Edge)
+- [x] Mobile: Export-Felder untereinander
+- [x] Mehr Abstand zwischen Cards (24px)
 
-Alle geplanten Features sind fertig. Bereit für Sprint 2 (Auth + Supabase).
+---
+
+### Deployment
+- [x] GitHub Repo: `https://github.com/mikelhilgers-ui/dach-rechner`
+- [x] Vercel: `https://dach-rechner.vercel.app` (auto-deploy bei git push)
+- [x] Vercel Analytics aktiv (Besucher, Land, Gerät, Browser)
+- [x] PWA: als App installierbar auf Android + iOS
+
+---
+
+## ✅ Sprint 1 – ABGESCHLOSSEN + LIVE
 
 ---
 
@@ -85,6 +95,8 @@ Alle geplanten Features sind fertig. Bereit für Sprint 2 (Auth + Supabase).
 - Angular 21 (Standalone, Signals, Vitest)
 - Angular Material 21
 - Node 24, npm 11
+- jsPDF (Client-side PDF)
+- Vercel (Hosting + Analytics)
 - Tests: Vitest (ng test --watch=false)
 
 ---
@@ -94,3 +106,6 @@ Alle geplanten Features sind fertig. Bereit für Sprint 2 (Auth + Supabase).
 - Phase 1: Reines Frontend, kein Auth, keine DB
 - Vitest statt Karma (Angular 21 Standard)
 - Signals für reaktive State-Verwaltung
+- Excel Export entfernt → würde Tool überflüssig machen
+- Anthrazit/Slate statt Blau als Primärfarbe
+- Vercel Analytics statt Plausible (kostenlos, kein Code nötig)

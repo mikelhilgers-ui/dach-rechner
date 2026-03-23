@@ -1,7 +1,23 @@
 <mat-toolbar color="primary" class="app-toolbar">
   <mat-icon class="toolbar-logo">roofing</mat-icon>
   <span class="toolbar-title">DachRechner</span>
-  <span class="toolbar-subtitle">Dachflächen-Rechner für Zimmerer</span>
+  <span class="toolbar-subtitle">Dachflächen-Rechner für Zimmerer · dach-rechner.vercel.app</span>
+
+  <span class="toolbar-spacer"></span>
+
+  @if (installPrompt()) {
+    <button mat-flat-button class="install-btn" (click)="installApp()"
+            matTooltip="Als App auf dem Gerät installieren">
+      <mat-icon>install_mobile</mat-icon>
+      <span class="install-label">App installieren</span>
+    </button>
+  }
+
+  <button mat-icon-button (click)="toggleTheme()"
+          [matTooltip]="darkMode() ? 'Light Mode' : 'Dark Mode'"
+          class="theme-toggle">
+    <mat-icon>{{ darkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
 </mat-toolbar>
 
 <main class="app-main">

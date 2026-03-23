@@ -59,6 +59,7 @@ export class CalculatorService {
     eindeckungPreisProM2:         40,
     unterdeckbahnPreisProM2:       2,
     daemmungPreisProM2:           18,
+    dampfbremsePreisProM2:         2,
     verbindungsmittelPreisProKg:   4,
     arbeitskostenProM2:           35,
     aufschlagProzent:             15,
@@ -438,27 +439,28 @@ export class CalculatorService {
       });
     }
 
-    // Dampfbremse (pauschal wie Unterdeckbahn)
+    // Dampfbremse
     if (dachaufbau.dampfbremse) {
       positionen.push({
         bezeichnung: 'Dampfbremse',
         menge: dachaufbau.dampfbremse.flaecheM2,
         einheit: 'm²',
-        preisProEinheit: cfg.unterdeckbahnPreisProM2,
-        gesamt: Math.round(dachaufbau.dampfbremse.flaecheM2 * cfg.unterdeckbahnPreisProM2),
+        preisProEinheit: cfg.dampfbremsePreisProM2,
+        gesamt: Math.round(dachaufbau.dampfbremse.flaecheM2 * cfg.dampfbremsePreisProM2),
       });
     }
 
-    // Verbindungsmittel
-    const vmGesamtKg = vm.positionen.reduce((s, p) => s + p.gewichtKg, 0);
-    if (vmGesamtKg > 0) {
-      positionen.push({
-        bezeichnung: 'Verbindungsmittel',
-        menge: Math.ceil(vmGesamtKg * 10) / 10,
-        einheit: 'kg',
-        preisProEinheit: cfg.verbindungsmittelPreisProKg,
-        gesamt: Math.round(vmGesamtKg * cfg.verbindungsmittelPreisProKg),
-      });
+    // Verbindungsmittel – jede Position einzeln
+    for (const vmPos of vm.positionen) {
+      if (vmPos.gewichtKg > 0) {
+        positionen.push({
+          bezeichnung: `${vmPos.bezeichnung} (${vmPos.dimension})`,
+          menge: vmPos.gewichtKg,
+          einheit: 'kg',
+          preisProEinheit: cfg.verbindungsmittelPreisProKg,
+          gesamt: Math.round(vmPos.gewichtKg * cfg.verbindungsmittelPreisProKg),
+        });
+      }
     }
 
     const materialkosten = positionen.reduce((s, p) => s + p.gesamt, 0);
