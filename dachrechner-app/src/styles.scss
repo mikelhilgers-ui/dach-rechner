@@ -80,3 +80,9 @@ html:not(.dark) body { color-scheme: light; }
 // Utility
 .full-width  { width: 100%; }
 .text-center { text-align: center; }
+
+// Install-Button: global override (bypasses Angular view encapsulation)
+.install-btn.mat-mdc-button-base {
+  background-color: #37474f !important;
+  color: white !important;
+}
